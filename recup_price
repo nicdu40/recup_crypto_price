@@ -1,0 +1,72 @@
+#!/bin/bash
+
+wget https://api.dex-trade.com/v1/public/symbols -P ~/symbols --no-check-certificate
+cat ~/symbols/symbols | sed "s/\"id\"/\n/g" > ~/symbols/symbols2
+rm cours.csv
+rm -rf ~/dex/*
+
+while read line; do
+
+pair="$(echo "$line" | awk  -F "\"" '{print $4}')"
+base="$(echo "$line" | awk  -F "\"" '{print $8}')"
+quote="$(echo "$line" | awk  -F "\"" '{print $12}')"
+  
+wget  https://api.dex-trade.com/v1/public/book?pair=$pair -P ~/dex --no-check-certificate
+
+buy="$(cat ~/dex/book\?pair=$pair | sed "s/\],/\n/g" | sed "s/{\"status\":true,\"data\":{//g" | grep buy | awk  -F "\:" '{print $4}' | awk  -F "," '{print $1}'| sed 's/\./\,/g')" 
+sell="$(cat ~/dex/book\?pair=$pair | sed "s/\],/\n/g" | sed "s/{\"status\":true,\"data\":{//g" | grep sell | awk  -F "\:" '{print $4}' | awk  -F "," '{print $1}' | sed 's/\./\,/g')" 
+  
+echo -n "$pair"
+echo -n ";"
+echo -n "$base"
+echo -n ";"
+echo -n "$quote"
+echo -n ";"
+echo -n " $buy"
+echo -n ";"
+echo " $sell"
+
+
+if echo $pair | grep -q "BTCUSDT" ;then
+	echo -n "\"" >> cours.csv
+	echo -n "$pair" >> cours.csv  
+	echo -n  "\",\"" >> cours.csv
+	echo -n " $buy" >> cours.csv
+	echo -n "\",\"" >> cours.csv
+	echo -n " $sell" >> cours.csv
+	echo "\"" >> cours.csv
+
+elif echo $pair | grep -q "ETHUSDT" ;then
+	echo -n "\"" >> cours.csv
+	echo -n "$pair" >> cours.csv  
+	echo -n "\",\"" >> cours.csv
+	echo -n " $buy" >> cours.csv
+	echo -n "\",\"" >> cours.csv
+	echo -n " $sell" >> cours.csv
+	echo "\"" >> cours.csv
+
+elif echo $pair | grep -q "BNBUSDT" ;then
+	echo -n "\"" >> cours.csv
+	echo -n "$pair" >> cours.csv  
+	echo -n "\",\"" >> cours.csv
+	echo -n " $buy" >> cours.csv
+	echo -n "\",\"" >> cours.csv
+	echo -n " $sell" >> cours.csv
+	echo "\"" >> cours.csv	
+	
+elif echo $pair | grep -q "LTCUSDT" ;then
+	echo -n "\"" >> cours.csv
+	echo -n "$pair" >> cours.csv  
+	echo -n "\",\"" >> cours.csv
+	echo -n " $buy" >> cours.csv
+	echo -n "\",\"" >> cours.csv
+	echo -n " $sell" >> cours.csv
+	echo "\"" >> cours.csv		
+	
+else
+		echo "--" 	
+	 
+fi
+
+	
+done < ~/symbols/symbols2	
