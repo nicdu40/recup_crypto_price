@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 wget https://api.dex-trade.com/v1/public/symbols -P ~/symbols --no-check-certificate
 cat ~/symbols/symbols | sed "s/\"id\"/\n/g" > ~/symbols/symbols2
 rm cours.csv
